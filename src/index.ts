@@ -1,4 +1,4 @@
-import { Context, Schema, segment } from 'koishi'
+import { Context, Schema, segment, h } from 'koishi'
 import { resolve } from 'path'
 import {} from '@koishijs/plugin-console'
 
@@ -32,13 +32,10 @@ export function apply(ctx: Context) {
       const images = result.data.images || [];
 
       if (type === "视频") {
-        return session.sendQueued(segment.video(result.data.url))
+        session.send(h.video(result.data.url))
       } else {
         images.forEach(async item => {
-          const img: any = await ctx.http.get<ArrayBuffer>(item, {
-            responseType: 'arraybuffer',
-          });
-          return session.sendQueued(segment.image(img))
+          session.send(h.image(item))
         });
       }
 
