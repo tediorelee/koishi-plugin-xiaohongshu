@@ -18,7 +18,7 @@ export function apply(ctx: Context) {
 
   ctx.middleware(async (session, next) => {
     if (!session.content.includes('xhslink.com')) return next()
-    const urlRegex = /http:\/\/xhslink\.com\/\w+/;
+    const urlRegex = /https?:\/\/[^\s，]+/;
     const url = session.content.match(urlRegex);
     if (!url) return
 
