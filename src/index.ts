@@ -4,16 +4,19 @@ import {} from '@koishijs/plugin-console'
 
 export const name = 'xiaohongshu'
 
-export interface Config {}
+export interface Config {
+  apiHost: string
+}
 
-export const Config: Schema<Config> = Schema.object({})
+export const Config = Schema.object({
+  apiHost: Schema.string().default('https://api.mu-jie.cc/xhs').description('填写你的API前缀'),
+  description: Schema.string().default('API参考: https://api.mu-jie.cc/').description(''),
+})
 
-export const api = 'https://api.mu-jie.cc/xhs?url='
-
-export function apply(ctx: Context) {
+export function apply(ctx: Context, config: Config) {
 
   async function fetchFromAPI(url) {
-    return await ctx.http.get(api + url);
+    return await ctx.http.get(config.apiHost + '?url=' + url);
   };
 
   ctx.middleware(async (session, next) => {
@@ -35,7 +38,7 @@ export function apply(ctx: Context) {
         session.send(h.video(result.data.url))
       } else {
         images.forEach(async item => {
-          session.send(h.image(item))
+          session.send(h('img', { src: item }))
         });
       }
 
