@@ -33,13 +33,23 @@ export function apply(ctx: Context, config: Config) {
       const type = result.data.type
       const title = result.data.title;
       const images = result.data.images || [];
+      await session.send(title.replace(/[|&;$%@"<>()+,]/g, ""));
 
       if (type === "视频") {
         session.send(h.video(result.data.url))
       } else {
-        images.forEach(async item => {
-          session.send(h('img', { src: item }))
-        });
+        if (images.length > 3) {
+          // 图片过多合并转发
+          const forwardMessages = await Promise.all(images.map(async (img) => {
+            return h('img', { src: img })
+          }));
+          const forwardMessage = h('message', { forward: true, children: forwardMessages });
+          await session.send(forwardMessage);
+        } else {
+          images.forEach(async item => {
+            session.send(h('img', { src: item }))
+          });
+        }
       }
 
     } catch(err) {
